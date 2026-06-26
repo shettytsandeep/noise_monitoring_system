@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Noise Monitoring System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:
+linear-gradient(rgba(0,0,0,0.75),
+rgba(0,0,0,0.85)),
+url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070&auto=format&fit=crop');
+
+background-size:cover;
+background-position:center;
+min-height:100vh;
+color:white;
+transition:0.5s;
+}
+
+.loginPage{
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.loginBox{
+width:360px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+padding:40px;
+border-radius:20px;
+text-align:center;
+box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+.loginBox h1{
+color:#38bdf8;
+margin-bottom:15px;
+font-size:34px;
+}
+
+.loginBox p{
+color:#d1d5db;
+margin-bottom:25px;
+}
+
+.loginBox input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+outline:none;
+font-size:16px;
+}
+
+.loginBox button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#0ea5e9;
+color:white;
+font-size:17px;
+cursor:pointer;
+}
+
+.error{
+margin-top:15px;
+color:#ef4444;
+font-weight:bold;
+}
+
+.dashboard{
+display:none;
+padding:20px;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:15px;
+margin-bottom:25px;
+}
+
+.topbar h1{
+color:#38bdf8;
+}
+
+.dateTimeBox{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:14px 22px;
+border-radius:18px;
+text-align:center;
+box-shadow:0 0 15px rgba(0,0,0,0.4);
+}
+
+#liveTime{
+font-size:28px;
+font-weight:bold;
+color:#38bdf8;
+}
+
+#liveDate{
+margin-top:4px;
+color:#d1d5db;
+font-size:15px;
+}
+
+.topButtons{
+display:flex;
+gap:10px;
+}
+
+.logout{
+padding:10px 18px;
+border:none;
+border-radius:10px;
+background:#ef4444;
+color:white;
+cursor:pointer;
+}
+
+.themeBtn{
+padding:10px 18px;
+border:none;
+border-radius:10px;
+background:#0ea5e9;
+color:white;
+cursor:pointer;
+}
+
+#roomSelect{
+padding:12px;
+border-radius:10px;
+margin-bottom:20px;
+font-size:16px;
+}
+
+.mainNoiseBox{
+width:100%;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+border-radius:25px;
+padding:35px;
+margin-bottom:25px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+text-align:center;
+}
+
+.mainNoiseBox h2{
+color:#38bdf8;
+margin-bottom:20px;
+}
+
+.noiseValue{
+font-size:75px;
+font-weight:bold;
+}
+
+.status{
+margin-top:15px;
+font-size:24px;
+font-weight:bold;
+}
+
+.green{
+color:#22c55e;
+}
+
+.yellow{
+color:#facc15;
+}
+
+.red{
+color:#ef4444;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:25px;
+border-radius:20px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+cursor:pointer;
+transition:0.3s;
+text-align:center;
+}
+
+.card:hover{
+transform:scale(1.03);
+}
+
+.card h2{
+color:#38bdf8;
+margin-bottom:15px;
+}
+
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.85);
+justify-content:center;
+align-items:center;
+z-index:999;
+padding:20px;
+}
+
+.popupContent{
+width:90%;
+max-width:850px;
+background:#0f172a;
+border-radius:20px;
+padding:30px;
+box-shadow:0 0 30px rgba(0,0,0,0.6);
+max-height:90vh;
+overflow-y:auto;
+}
+
+.popupContent h1{
+color:#38bdf8;
+margin-bottom:20px;
+}
+
+.popupContent input{
+width:100%;
+padding:14px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+}
+
+.popupContent button{
+width:100%;
+padding:14px;
+margin-top:20px;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
+
+.closeBtn{
+background:red;
+}
+
+.sendBtn{
+background:#22c55e;
+}
+
+.buzzerOn{
+background:#ef4444;
+}
+
+.buzzerOff{
+background:#64748b;
+}
+
+.footer{
+margin-top:35px;
+text-align:center;
+}
+
+@media(max-width:768px){
+
+.noiseValue{
+font-size:50px;
+}
+
+.loginBox{
+width:92%;
+}
+
+.topbar{
+flex-direction:column;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="loginPage" id="loginPage">
+
+<div class="loginBox">
+
+<h1>
+Noise Monitoring System
+</h1>
+
+<p>
+Smart IoT Monitoring Platform
+</p>
+
+<input type="text"
+id="username"
+placeholder="Enter Username">
+
+<input type="password"
+id="password"
+placeholder="Enter Password">
+
+<button onclick="login()">
+LOGIN
+</button>
+
+<div class="error" id="error"></div>
+
+</div>
+
+</div>
+
+<div class="dashboard" id="dashboard">
+
+<div class="topbar">
+
+<h1>
+Noise Monitoring System
+</h1>
+
+<div class="dateTimeBox">
+
+<div id="liveTime">
+00:00:00
+</div>
+
+<div id="liveDate">
+Loading Date...
+</div>
+
+</div>
+
+<div class="topButtons">
+
+<button class="themeBtn"
+onclick="toggleTheme()">
+
+🌙 / ☀
+
+</button>
+
+<button class="logout"
+onclick="logout()">
+
+Logout
+
+</button>
+
+</div>
+
+</div>
+
+<select id="roomSelect">
+
+<option>Classroom A</option>
+<option>Library</option>
+<option>Laboratory</option>
+<option>Seminar Hall</option>
+
+</select>
+
+<div class="mainNoiseBox">
+
+<h2>
+Current Noise Level
+</h2>
+
+<div class="noiseValue" id="noiseValue">
+0
+</div>
+
+<div class="status yellow" id="status">
+WAITING FOR SENSOR DATA
+</div>
+
+<p id="smartSuggestion"
+style="
+margin-top:15px;
+font-size:18px;
+color:#d1d5db;">
+
+System Ready.
+
+</p>
+
+<div style="margin-top:25px;">
+
+<div style="
+width:100%;
+height:25px;
+background:#1e293b;
+border-radius:20px;
+overflow:hidden;">
+
+<div id="soundBar"
+style="
+height:100%;
+width:0%;
+background:#22c55e;
+transition:0.5s;">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+<div class="card"
+onclick="openPopup('lcdPopup')">
+
+<h2>
+📢 LCD Display Control
+</h2>
+
+<p>
+Send Message To LCD
+</p>
+
+</div>
+
+<div class="card"
+onclick="openPopup('buzzerPopup')">
+
+<h2>
+🔔 Noise Alert Buzzer
+</h2>
+
+<p>
+Turn Buzzer ON/OFF
+</p>
+
+</div>
+
+<div class="card"
+onclick="openPopup('thresholdPopup')">
+
+<h2>
+⚙ Threshold Configuration
+</h2>
+
+<p>
+Configure Noise Limits
+</p>
+
+</div>
+
+<div class="card"
+onclick="openPopup('graphPopup')">
+
+<h2>
+📈 Graph Analysis
+</h2>
+
+<p>
+View Live Graph
+</p>
+
+</div>
+
+</div>
+
+<div class="card"
+style="
+margin-top:25px;
+border:2px solid #ef4444;">
+
+<h2>
+🚨 Live Alert Panel
+</h2>
+
+<p id="alertPanel">
+No Critical Alerts
+</p>
+
+</div>
+
+<div class="footer">
+Smart IoT Noise Monitoring Dashboard
+</div>
+
+</div>
+
+<div class="popup" id="lcdPopup">
+
+<div class="popupContent">
+
+<button class="closeBtn"
+onclick="closePopup('lcdPopup')">
+
+CLOSE
+
+</button>
+
+<h1>
+LCD Display Control
+</h1>
+
+<input type="text"
+id="lcdMessageInput"
+placeholder="Write Message For LCD">
+
+<button class="sendBtn"
+onclick="sendLCDMessage()">
+
+SEND MESSAGE
+
+</button>
+
+</div>
+
+</div>
+
+<div class="popup" id="buzzerPopup">
+
+<div class="popupContent">
+
+<button class="closeBtn"
+onclick="closePopup('buzzerPopup')">
+
+CLOSE
+
+</button>
+
+<h1>
+Buzzer Control
+</h1>
+
+<button class="buzzerOn"
+onclick="turnBuzzerOn()">
+
+TURN ON BUZZER
+
+</button>
+
+<button class="buzzerOff"
+onclick="turnBuzzerOff()">
+
+TURN OFF BUZZER
+
+</button>
+
+<p id="buzzerStatus"
+style="
+margin-top:20px;
+font-size:20px;
+font-weight:bold;
+color:#38bdf8;">
+
+Buzzer Status : OFF
+
+</p>
+
+</div>
+
+</div>
+
+<div class="popup" id="thresholdPopup">
+
+<div class="popupContent">
+
+<button class="closeBtn"
+onclick="closePopup('thresholdPopup')">
+
+CLOSE
+
+</button>
+
+<h1>
+Threshold Configuration
+</h1>
+
+<label style="display:block; text-align:left; margin-top:15px; font-weight:bold; color:#38bdf8;">Silence Threshold</label>
+<input type="number"
+id="silenceThreshold"
+placeholder="Silence Threshold"
+value="1600">
+
+<label style="display:block; text-align:left; margin-top:15px; font-weight:bold; color:#38bdf8;">Medium Threshold</label>
+<input type="number"
+id="mediumThreshold"
+placeholder="Medium Threshold"
+value="2700">
+
+<button class="sendBtn"
+onclick="applyThreshold()">
+
+APPLY SETTINGS
+
+</button>
+
+</div>
+
+</div>
+
+<div class="popup" id="graphPopup">
+
+<div class="popupContent">
+
+<button class="closeBtn"
+onclick="closePopup('graphPopup')">
+
+CLOSE
+
+</button>
+
+<h1>
+Real-Time Graph Analysis
+</h1>
+
+<canvas id="noiseChart"></canvas>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+onValue,
+set
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyBYPDNkPrZaXCAYU00sZRx0cRT3bSH9tRo",
+
+authDomain:
+"noisemonitoringsystem-f07a0.firebaseapp.com",
+
+databaseURL:
+"https://noisemonitoringsystem-f07a0-default-rtdb.firebaseio.com",
+
+projectId:
+"noisemonitoringsystem-f07a0",
+
+storageBucket:
+"noisemonitoringsystem-f07a0.appspot.com",
+
+messagingSenderId:
+"898305181336",
+
+appId:
+"1:898305181336:web:1f99974ea2b22d89aaf2ed"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const database =
+getDatabase(app);
+
+let darkMode = true;
+
+// Synchronized initial default values with your Arduino script parameters
+let silenceThreshold = 1600;
+let mediumThreshold = 2700;
+
+Notification.requestPermission();
+
+function login(){
+
+let user =
+document.getElementById("username").value.trim();
+
+let pass =
+document.getElementById("password").value.trim();
+
+let error =
+document.getElementById("error");
+
+if(user === "" || pass === ""){
+
+error.innerHTML =
+"⚠ Please Enter Username and Password";
+
+return;
+}
+
+if(user === "solution" &&
+pass === "123456"){
+
+document.getElementById("loginPage")
+.style.display = "none";
+
+document.getElementById("dashboard")
+.style.display = "block";
+}
+
+else{
+
+error.innerHTML =
+"❌ Wrong Username or Password";
+}
+}
+
+function logout(){
+location.reload();
+}
+
+function openPopup(id){
+document.getElementById(id)
+.style.display = "flex";
+}
+
+function closePopup(id){
+document.getElementById(id)
+.style.display = "none";
+}
+
+function toggleTheme(){
+
+if(darkMode){
+
+document.body.style.background =
+"#f1f5f9";
+
+document.body.style.color =
+"black";
+
+document.body.style.backgroundImage =
+"none";
+
+darkMode = false;
+}
+
+else{
+
+document.body.style.background =
+"linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070&auto=format&fit=crop')";
+
+document.body.style.backgroundSize =
+"cover";
+
+document.body.style.backgroundPosition =
+"center";
+
+document.body.style.color =
+"white";
+
+darkMode = true;
+}
+}
+
+setInterval(()=>{
+
+let now = new Date();
+
+document.getElementById("liveTime")
+.innerHTML =
+now.toLocaleTimeString();
+
+document.getElementById("liveDate")
+.innerHTML =
+now.toDateString();
+
+},1000);
+
+function sendLCDMessage(){
+
+let msg =
+document.getElementById("lcdMessageInput").value;
+
+set(ref(database,"lcdMessage"),msg);
+
+document.getElementById(
+"alertPanel"
+).innerHTML =
+"📢 LCD Message Sent";
+
+alert("Message Sent To LCD");
+}
+
+function turnBuzzerOn(){
+
+set(ref(database,"buzzer"),1);
+
+document.getElementById(
+"buzzerStatus"
+).innerHTML =
+"Buzzer Status : ON";
+
+document.getElementById(
+"alertPanel"
+).innerHTML =
+"🔔 Buzzer Turned ON";
+}
+
+function turnBuzzerOff(){
+
+set(ref(database,"buzzer"),0);
+
+document.getElementById(
+"buzzerStatus"
+).innerHTML =
+"Buzzer Status : OFF";
+
+document.getElementById(
+"alertPanel"
+).innerHTML =
+"🔕 Buzzer Turned OFF";
+}
+
+function applyThreshold(){
+
+silenceThreshold =
+parseInt(
+document.getElementById("silenceThreshold").value);
+
+mediumThreshold =
+parseInt(
+document.getElementById("mediumThreshold").value);
+
+set(ref(database,"threshold/silence"),
+silenceThreshold);
+
+set(ref(database,"threshold/medium"),
+mediumThreshold);
+
+document.getElementById(
+"alertPanel"
+).innerHTML =
+"✅ Threshold Updated Successfully";
+
+alert(
+"✅ Threshold Updated Successfully");
+}
+
+const ctx =
+document.getElementById('noiseChart');
+
+const noiseChart = new Chart(ctx, {
+
+type:'line',
+
+data:{
+
+labels:['1','2','3','4','5','6','7'],
+
+datasets:[{
+
+label:'Noise Level',
+
+data:[0,0,0,0,0,0,0],
+
+borderColor:'#38bdf8',
+
+backgroundColor:'rgba(56,189,248,0.2)',
+
+fill:true,
+
+tension:0.4
+}]
+},
+
+options:{
+responsive:true
+}
+});
+
+const noiseRef =
+ref(database, 'noiseValue');
+
+onValue(noiseRef, (snapshot) => {
+
+const noise = snapshot.val();
+
+if(noise == null) return;
+
+document.getElementById("noiseValue")
+.innerHTML = noise;
+
+let status =
+document.getElementById("status");
+
+let soundBar =
+document.getElementById("soundBar");
+
+let percentage =
+(noise / 5000) * 100;
+
+soundBar.style.width =
+percentage + "%";
+
+// Condition tracking aligned precisely with Arduino code bounds
+if(noise < silenceThreshold){
+
+status.innerHTML =
+"SILENT ENVIRONMENT DETECTED";
+
+status.className =
+"status green";
+
+soundBar.style.background =
+"#22c55e";
+
+document.getElementById("smartSuggestion")
+.innerHTML =
+"Environment is peaceful. No action required.";
+}
+
+else if(noise >= silenceThreshold && noise < mediumThreshold){
+
+status.innerHTML =
+"MODERATE ACOUSTIC ACTIVITY";
+
+status.className =
+"status yellow";
+
+soundBar.style.background =
+"#facc15";
+
+document.getElementById("smartSuggestion")
+.innerHTML =
+"Moderate noise detected. Please maintain silence.";
+}
+
+else{
+
+status.innerHTML =
+"CRITICAL NOISE LEVEL DETECTED";
+
+status.className =
+"status red";
+
+soundBar.style.background =
+"#ef4444";
+
+let currentRoom =
+document.getElementById("roomSelect").value;
+
+document.getElementById("smartSuggestion")
+.innerHTML =
+"Critical noise detected in " +
+currentRoom +
+". Immediate attention required.";
+
+document.getElementById("alertPanel")
+.innerHTML =
+"⚠ Critical Noise Detected In " +
+currentRoom;
+}
+
+noiseChart.data.datasets[0].data.push(noise);
+
+noiseChart.data.datasets[0].data.shift();
+
+noiseChart.update();
+
+});
+
+window.login = login;
+window.logout = logout;
+window.toggleTheme = toggleTheme;
+window.openPopup = openPopup;
+window.closePopup = closePopup;
+window.applyThreshold = applyThreshold;
+window.turnBuzzerOn = turnBuzzerOn;
+window.turnBuzzerOff = turnBuzzerOff;
+window.sendLCDMessage = sendLCDMessage;
+
+</script>
+
+</body>
+</html>

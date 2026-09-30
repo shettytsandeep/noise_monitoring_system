@@ -1,3 +1,3 @@
 NOISE MONITORING SYSTEM
-It is Arduino based project in which web based sytem is designed to detect the noise and showed to the incharge through web .
+It is Arduino based project in which web based sytem is designed to detect the noise 
 it is IOT based project.
